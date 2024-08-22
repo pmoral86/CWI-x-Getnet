@@ -1,0 +1,459 @@
+{
+	"info": {
+		"_postman_id": "bcf6a983-3bbc-493d-b16b-59590d22f41e",
+		"name": "Testes Getnet",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37832505"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var client_Id = \"67823c6d-58de-494f-96d9-86a4c22682cb\";\r",
+							"var client_Secret = \"c2d6a06f-5f31-448b-9079-7e170e8536e4\";\r",
+							"var concatenatedIds = client_Id + \":\" + client_Secret;\r",
+							"\r",
+							"function toBase64(str) {\r",
+							"    return Buffer.from(str).toString('base64');\r",
+							"}\r",
+							"\r",
+							"var encodedIds = toBase64(concatenatedIds);\r",
+							"\r",
+							"pm.environment.set(\"encodedIds\", encodedIds);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"class ApiResponse {\r",
+							"    constructor(access_token, expires_in, token_type, scope) {\r",
+							"        this.access_token = access_token;\r",
+							"        this.expires_in = expires_in;\r",
+							"        this.token_type = token_type;\r",
+							"        this.scope = scope;\r",
+							"    }\r",
+							"\r",
+							"    getAccessToken() {\r",
+							"        return this.access_token;\r",
+							"    }\r",
+							"\r",
+							"    getExpiresIn() {\r",
+							"        return this.expires_in;\r",
+							"    }\r",
+							"\r",
+							"    getTokenType() {\r",
+							"        return this.token_type;\r",
+							"    }\r",
+							"\r",
+							"    getScope() {\r",
+							"        return this.scope;\r",
+							"    }\r",
+							"}\r",
+							"\r",
+							"var responseJson = pm.response.json();\r",
+							"pm.environment.set(\"access_token\", responseJson.access_token)\r",
+							"\r",
+							"const apiResponse = new ApiResponse(\r",
+							"    responseJson.access_token,\r",
+							"    responseJson.expires_in,\r",
+							"    responseJson.token_type,\r",
+							"    responseJson.scope\r",
+							");\r",
+							"\r",
+							"pm.test(\"Status Code é 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Campo access_token está presente\", function () {\r",
+							"    pm.expect(apiResponse.getAccessToken()).to.not.be.undefined;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Campo expires_in está presente\", function () {\r",
+							"    pm.expect(apiResponse.getExpiresIn()).to.not.be.undefined;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Campo token_type está presente\", function () {\r",
+							"    pm.expect(apiResponse.getTokenType()).to.not.be.undefined;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Campo scope está presente\", function () {\r",
+							"    pm.expect(apiResponse.getScope()).to.not.be.undefined;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Estrutura da resposta está correta\", function () {\r",
+							"    const expectedKeys = ['access_token', 'expires_in', 'token_type', 'scope'];\r",
+							"    const actualKeys = Object.keys(apiResponse);\r",
+							"    pm.expect(expectedKeys).to.eql(actualKeys);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic {{encodedIds}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "scope",
+							"value": "oob",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseURL}}/auth/oauth/v2/token",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"auth",
+						"oauth",
+						"v2",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Token",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var card_number = \"5155901222280002\";\r",
+							"var customer_id = \"customer_29081826\";\r",
+							"\r",
+							"pm.environment.set(\"card_number\", card_number);\r",
+							"pm.environment.set(\"customer_id\", customer_id);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"class ApiResponse {\r",
+							"    constructor(number_token) {\r",
+							"        this.number_token = number_token;\r",
+							"    }\r",
+							"\r",
+							"    getNumberToken() {\r",
+							"        return this.number_token;\r",
+							"    }\r",
+							"}\r",
+							"\r",
+							"const responseJson = pm.response.json();\r",
+							"pm.environment.set(\"number_token\", responseJson.number_token);\r",
+							"\r",
+							"const apiResponse = new ApiResponse(\r",
+							"    responseJson.number_token\r",
+							");\r",
+							"\r",
+							"pm.test(\"Status Code é 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Campo number_token está presente\", function () {\r",
+							"    pm.expect(apiResponse.getNumberToken()).to.not.be.undefined;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Estrutura da resposta está correta\", function () {\r",
+							"    const expectedKeys = ['number_token'];\r",
+							"    const actualKeys = Object.keys(apiResponse);\r",
+							"    pm.expect(expectedKeys).to.eql(actualKeys);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"card_number\": \"{{card_number}}\",\r\n  \"customer_id\": \"{{customer_id}}\"\r\n}"
+				},
+				"url": {
+					"raw": "{{baseURL}}/v1/tokens/card",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"v1",
+						"tokens",
+						"card"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Tokenization",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"class ApiResponse {\r",
+							"    constructor(network_token_id, status) {\r",
+							"        this.network_token_id = network_token_id;\r",
+							"        this.status = status;\r",
+							"    }\r",
+							"\r",
+							"    getNetworkTokenId() {\r",
+							"        return this.network_token_id;\r",
+							"    }\r",
+							"\r",
+							"    getStatus() {\r",
+							"        return this.status;\r",
+							"    }\r",
+							"}\r",
+							"\r",
+							"pm.test(\"Status Code é 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"if (pm.response.code === 200) {\r",
+							"    const responseJson = pm.response.json();\r",
+							"\r",
+							"    const apiResponse = new ApiResponse(\r",
+							"        responseJson.network_token_id,\r",
+							"        responseJson.status\r",
+							"    );\r",
+							"\r",
+							"    pm.test(\"Estrutura da resposta está correta\", function () {\r",
+							"        const expectedKeys = ['network_token_id', 'status'];\r",
+							"        const actualKeys = Object.keys(apiResponse);\r",
+							"        pm.expect(expectedKeys).to.eql(actualKeys);\r",
+							"    });\r",
+							"} else {\r",
+							"    pm.test(\"Falha: Resposta inesperada com Status Code diferente de 200\", function () {\r",
+							"        pm.expect.fail(\"Status code esperado: 200, mas foi recebido: \" + pm.response.code);\r",
+							"    });\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json; charset=utf-8",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"customer_id\": \"{{customer_id}}\",\r\n    \"card_pan\": \"{{card_number}}\",\r\n    \"card_pan_source\": \"MANUALLY_ENTERED\",\r\n    \"card_brand\": \"VISA\",\r\n    \"expiration_year\": \"2024\",\r\n    \"expiration_month\": \"09\",\r\n    \"security_code\": \"702\",\r\n    \"email\": \"tokenizacao_bandeiras@getnet.com.br\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/v1/tokenization/token",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"v1",
+						"tokenization",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Crypt",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"class ApiResponse {\r",
+							"    constructor(cryptogram, token_pan_card, token_expiration_month, token_expiration_year, token_status) {\r",
+							"        this.cryptogram = cryptogram;\r",
+							"        this.token_pan_card = token_pan_card;\r",
+							"        this.token_expiration_month = token_expiration_month;\r",
+							"        this.token_expiration_year = token_expiration_year;\r",
+							"        this.token_status = token_status;\r",
+							"    }\r",
+							"\r",
+							"    getCryptogram() {\r",
+							"        return this.cryptogram;\r",
+							"    }\r",
+							"\r",
+							"    getTokenPanCard() {\r",
+							"        return this.token_pan_card;\r",
+							"    }\r",
+							"\r",
+							"    getTokenExpirationMonth() {\r",
+							"        return this.token_expiration_month;\r",
+							"    }\r",
+							"\r",
+							"    getTokenExpirationYear() {\r",
+							"        return this.token_expiration_year;\r",
+							"    }\r",
+							"\r",
+							"    getTokenStatus() {\r",
+							"        return this.token_status;\r",
+							"    }\r",
+							"}\r",
+							"\r",
+							"pm.test(\"Status Code é 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"if (pm.response.code === 200) {\r",
+							"    const responseJson = pm.response.json();\r",
+							"\r",
+							"    const apiResponse = new ApiResponse(\r",
+							"        responseJson.cryptogram,\r",
+							"        responseJson.token_pan_card,\r",
+							"        responseJson.token_expiration_month,\r",
+							"        responseJson.token_expiration_year,\r",
+							"        responseJson.token_status\r",
+							"    );\r",
+							"\r",
+							"    pm.test(\"Estrutura da resposta está correta\", function () {\r",
+							"        const expectedKeys = [\r",
+							"            'cryptogram', \r",
+							"            'token_pan_card', \r",
+							"            'token_expiration_month', \r",
+							"            'token_expiration_year', \r",
+							"            'token_status'\r",
+							"        ];\r",
+							"        const actualKeys = Object.keys(apiResponse);\r",
+							"        pm.expect(expectedKeys).to.eql(actualKeys);\r",
+							"    });\r",
+							"} else {\r",
+							"    pm.test(\"Falha: Resposta inesperada com Status Code diferente de 200\", function () {\r",
+							"        pm.expect.fail(\"Status code esperado: 200, mas foi recebido: \" + pm.response.code);\r",
+							"    });\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{access_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json; charset=utf-8",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"network_token_id\": \"{{network_token_id}}\",\r\n  \"transaction_type\": \"CIT\",\r\n  \"cryptogram_type\": \"VISA_TAVV\",\r\n  \"amount\": 100,\r\n  \"customer_id\": \"{{customer_id}}\",\r\n  \"email\": \"tokenizacao_bandeira@getnet.com.br\",\r\n  \"card_brand\": \"VISA\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/v1/tokenization/crypt",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"v1",
+						"tokenization",
+						"crypt"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
