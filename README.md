@@ -4,7 +4,7 @@ Interview for CWI Company for client Getnet
 
 # Questionaire
 
-There is a .pdf file with the answers
+There is a prova_api_QA_JS (Paulo Moral).pdf file with the answers
 
 ## Pre-requirements
 
@@ -31,7 +31,7 @@ ________________________________________________________________________________
 
 ## Frontend tests
 
-Download or access the branch on Github
+Download or access the branch on Github to open file Cypress/cypress/e2e/test_Getnet.cy.js
 
 ## Installation
 
